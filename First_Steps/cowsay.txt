@@ -1,0 +1,37 @@
+
+
+		Создать простое приложение на примере cowsay/
+
+		Cowsay - приложение для развлечения, которое выводит информацию
+						 мыслями коровы или дургого животного (рисутеся корова
+						 из ASCII символов и сверху текст (как в 2D играх))
+
+
+		Создадим контейнер:
+
+				 docker run -it --name cowsay --hostname cowsay debian bash
+
+				 	Во внутреннем shell контейнера:
+
+				 			Установим приложение cowsay:
+		
+						 			apt-get update
+						 			apt-get install -y cowsay fortune
+
+						 	Запуск:
+
+						 			/usr/games/fortune | /usr/games/cowsay
+
+						 	Закроем:
+
+						 		exit
+
+		Сохраним контейнер:
+
+				docker commit cowsay test/cowsayimage
+
+				# Вернется уникальный ID созданного образа
+
+		Запустим:
+
+				docker run test/cowsayimage /usr/games/cowsay "Moo"

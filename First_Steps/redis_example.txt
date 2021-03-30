@@ -1,0 +1,87 @@
+
+
+		 Использование оффициального образа Redis
+
+
+		 		Загрузить образ:
+
+		 				docker pull redis
+
+		 		
+		 		Запустить Redis-сервер в фоновом режиме (-d) с именем redis-serv
+
+		 				docker run --name redis-serv -d redis
+
+
+		 		Запустить клиент:
+
+		 				docker run --rm -it --link redis-serv:redis redis /bin/bash
+
+		 				Внутри контейнера запускае клиент:
+
+		 						redis-cli -h redis -p 6379
+
+		 						Проверка:
+		 								
+		 								ping
+		 								set "abc" 123
+		 								get "abc"
+		 								exit
+
+		 						exit
+
+		 				Установление соединения определяется --link redis-serv:redis, Docker 
+		 				получает информацию, что нужно установить соединение между новым контейнером
+		 				и существующим контейнером redis-serv. 
+ 						(Для этого Docker создает в файле нового контейнера /etc/hosts запись redis,
+ 						указывающий IP адрес контейнера redis-serv)
+		 				Это позволяет пользоваться именем хоста redis в командной строке (redis-cli),
+		 				без доп использования IP. 
+
+		 				Команда (--link) - установление соединеня между контейнерами в сети,
+		 				в будущем планируется изменить на "публикацию сервесов" publish services
+
+
+		 				Чтобы сохранить полученные данные следует использовать Томов.
+
+		 				Тома (volumes) - файлы или каталоги, которые смонтированы на хосте и не являются
+		 				частью каскадной каскадно-объекдиненной файловой системы.
+		 				Существует 2 способа объявления каталога как тома:
+		 						1) Инструкция VOLUME в Dockerfile (VOLUME /data)
+		 						2) команда docker run -v /data test/webserver
+
+		 				По умолчанию заданный каталог или файл бует смонтирван на хосте внутри катлога,
+		 				где был установлен Docker (var/lib/docker). Каталог можно изменить в команде
+		 				docker run:
+
+		 						docker run -d -v /host/dir:/container/dir test/webserver
+
+		 				В файле Dockerfile определить каталог хоста невозможно, потому что это небезопасно
+		 				и каталоги могут оличаться.
+
+		 				Проверем это для Redis:
+
+		 						docker run --rm -it --link redis-serv:redis redis /bin/bash
+
+		 						-->
+		 								redis-cli -h redis -p 6379
+		 								set "persistence" "test"
+		 								save
+		 								exit
+
+		 						exit
+
+
+		 						docker run --rm --volumes-from redis-serv -v $(pwd)/backup:/backup \ debian cp /date/dump.rdb /backup/
+		 						ls backup
+
+		 						-v - для монтирования существуюего каталога хоста
+		 						--volumes-from - для установления соединения между новым контейнером и каталогом БД Redis/
+
+
+		 				Остановить и удалить Redis, затем удалить все отсавшиеся вспомогательные контейнеры:
+
+		 						docker stop redis-serv
+		 						docker rm -v redis-serv
+		 						docker rm $(docker ps -sq)
+

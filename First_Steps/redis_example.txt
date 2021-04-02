@@ -84,4 +84,3 @@
 		 						docker stop redis-serv
 		 						docker rm -v redis-serv
 		 						docker rm $(docker ps -sq)
-

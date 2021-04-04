@@ -1,0 +1,50 @@
+
+
+		Использование Docker в процессе разработки
+
+				Программа - "Hello World"
+
+				Создадим каталог identidock для хранения проекта.
+				В каталоге создадим подкаталог app для файлов кода Python
+				В каталоге app создадим файл identidock.py:
+
+					identidock
+					|
+					|--- app
+								|
+								|--- identidock.py
+
+				Далее следует создать контейнер для приложения,
+				нужно создать в каталоге identidock файл Docker:
+
+						FROM python:3.4  # Выбираем версию языка
+
+						RUN pip install Flask==0.10.1 # Устанавливае Flask
+						WORKDIR /app									# Устанавливаем рабочий каталог
+						COPY app /app									# Копируем содержимое каталога 
+																					# app в каталог контейнера /app
+
+						CMD ["python", "identidock.py"] # Зпаустить код файла/
+
+				Теперь можно создать и запустить приложение
+
+						cd indentidock
+						docker build -t identidock .
+							... здаесь компановка
+
+				Запускаем конетйнер в фоновом режиме (-d), его можно отключить,
+				чтобы видеть результат работы сервера. И перенаправляем 5000 порт 
+				порт контейнера на 5000 порт компа (-p) 
+						
+						docker run -d -p 5000:5000 identidock 
+
+				Тест (localhot может не работать на Docker машинах (установленных через Toolbox)):
+
+						curl localhost:5000
+
+				Остановить удалить контейнер:
+
+						sudo docker stop $(sudo docker ps -lq) 
+						sudo docker rm $(sudo docker ps -lq)
+
+
